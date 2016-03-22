@@ -4,9 +4,9 @@ This is a time-stamp micro-service project writing for [Free Code Camp][1].
 
 ## Example End Points
 
-https://herokuapp.com/December%20,%202015
+https://damp-tundra-28024.herokuapp.com/December%20,%202015
 
-https://herokuapp.com/1450137600
+https://damp-tundra-28024.herokuapp.com/1450137600
 
 ## Example Output
 
