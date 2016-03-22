@@ -1,3 +1,11 @@
-var stream = process.stdout;
+var express = require('express');
+var path = require('path');
+var app = express();
 
-stream.write('Hello, World\n\n');
+app.use(express.static(path.join(__dirname, '..', 'public')));
+
+app.get('/', function(req, res) {
+  res.sendFile(path.join(__dirname, '..', 'public/index.html'));
+});
+
+module.exports = app;
