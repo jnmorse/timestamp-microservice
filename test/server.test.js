@@ -23,10 +23,10 @@ describe('When I make a GET request to /:date ', function() {
         .expect('Content-Type', /json/, done);
     });
 
-    it('should return {unix: 315964800, natural: "January 6, 1980"}', function(done) {
+    it('should return {unix: 315982800000, natural: "January 6, 1980"}', function(done) {
       request(app)
         .get('/January%206,%201980')
-        .expect({ unix: 315982800, natural: 'January 6, 1980' }, done);
+        .expect({ unix: 315982800000, natural: 'January 6, 1980' }, done);
     });
   });
 
@@ -38,11 +38,27 @@ describe('When I make a GET request to /:date ', function() {
     });
   });
 
-  describe('And I call it with 315982800', function() {
-    it('should return {unix: 315982800, natural: "January 6, 1980"}', function(done) {
+  describe('And I call it with 315982800000', function() {
+    it('should return {unix: 315982800000, natural: "January 6, 1980"}', function(done) {
       request(app)
         .get('/315982800000')
-        .expect({ unix: 315982800, natural: 'January 6, 1980' }, done);
+        .expect({ unix: 315982800000, natural: 'January 6, 1980' }, done);
+    });
+  });
+
+  describe('Called with December%201,%202015', function() {
+    it('shold return { unix: 1448946000000, natural: "December 1, 2015" }', function(done) {
+      request(app)
+        .get('/December%201,%202015')
+        .expect({ unix: 1448946000000, natural: 'December 1, 2015' }, done);
+    });
+  });
+
+  describe('Called with 1448946000000', function() {
+    it('should return {unix: 1448946000000, natural: "December 1, 2015"}', function(done) {
+      request(app)
+        .get('/1448946000000')
+        .expect({ unix: 1448946000000, natural: 'December 1, 2015' }, done);
     });
   });
 });

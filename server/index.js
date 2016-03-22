@@ -33,8 +33,16 @@ app.get('/', function(req, res) {
 });
 
 app.get('/:date', function(req, res) {
-  var date = new Date(+req.params.date || req.params.date);
-  var unix = moment(date).format('X');
+  var date = req.params.date;
+
+  if (typeof +date === 'number' && +date > 0) {
+    date = +date;
+  }
+
+  date = new Date(date);
+  console.log(Date.now(), date.getFullYear());
+
+  var unix = moment(date).format('x');
   var natural = moment(date).format('MMMM D, YYYY');
 
   unix = unix === 'Invalid date' ? null : unix;
