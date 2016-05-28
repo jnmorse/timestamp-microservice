@@ -1,54 +1,69 @@
-var express = require('express');
-var path = require('path');
-var fs = require('fs');
-var marked = require('marked');
-var moment = require('moment');
-var app = express();
+'use strict'
+
+const express = require('express')
+const path = require('path')
+const fs = require('fs')
+const marked = require('marked')
+const moment = require('moment')
+
+const dateToNumber = require('./middleware/date-to-number')
+
+const app = express()
 
 marked.setOptions({
   tables: true,
   gfm: true,
   sanitize: true
-});
+})
 
-app.use(express.static(path.join(__dirname, '..', 'public')));
-
-app.get('/', function(req, res) {
-  var index = path.join(__dirname, '..', 'views/index.md');
-  fs.readFile(index, 'utf-8', function(err, body) {
-    if (err) {
-      res.send(err);
-    }
-
-    var header = '<!DOCTYPE html><html><head>'
-      + '<link rel="stylesheet" href="/css/github-markdown.css">'
-      + '</head><body><div class="markdown-body">';
-
-    body = marked(body, { gfm: true, sanitize: true });
-
-    var footer = '</div></body></html>';
-
-    res.send(header + body + footer);
-  });
-});
-
-app.get('/:date', function(req, res) {
-  var date = req.params.date;
-
-  if (typeof +date === 'number' && +date > 0) {
-    date = +date;
+/**
+ * Middleware to return 404 for favicon
+ */
+app.use(function (req, res, next) {
+  if (req.path.match(/^\/favicon/)) {
+    res.sendStatus(404)
   }
 
-  date = new Date(date);
-  console.log(Date.now(), date.getFullYear());
+  next()
+})
 
-  var unix = moment(date).format('x');
-  var natural = moment(date).format('MMMM D, YYYY');
+app.use(express.static(path.join(__dirname, '..', 'public')))
 
-  unix = unix === 'Invalid date' ? null : unix;
-  natural = natural === 'Invalid date' ? null : natural;
+app.get('/', function(req, res, next) {
+  const index = path.join(__dirname, '..', 'views/index.md')
 
-  res.status(200).send({ unix: unix, natural: natural });
-});
+  fs.readFile(index, 'utf-8', function(err, body) {
+    if (err) {
+      next(err)
+    }
 
-module.exports = app;
+    const header = '<!DOCTYPE html><html><head>'
+      + '<link rel="stylesheet" href="/css/github-markdown.css">'
+      + '</head><body><div class="markdown-body">'
+
+    body = marked(body, { gfm: true, sanitize: true })
+
+    const footer = '</div></body></html>'
+
+    res.send(header + body + footer)
+  })
+})
+
+app.get('/:date', dateToNumber(), function(req, res, next) {
+  let date = req.params.date
+
+  if (typeof date ==='string' && date.match(/^favicon/)) { return next() }
+
+  date = moment(new Date(req.params.date))
+
+  if (date.isValid()) {
+    return res.send({
+      unix: date.format('X'),
+      natural: date.format('MMMM D, YYYY')
+    })
+  }
+
+  res.status(200).send({ unix: null, natural: null })
+})
+
+module.exports = app
